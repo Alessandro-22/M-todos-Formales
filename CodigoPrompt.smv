@@ -1,0 +1,29 @@
+MODULE main
+VAR
+    state : {editing, validating}; -- Estados del sistema
+    isPromptValid : boolean;       -- Variable que indica si el prompt es válido
+    isPromptComplete : boolean;   -- Indica si el prompt está completo
+    promptRulesSatisfied : boolean; -- Reglas de validación
+
+ASSIGN
+    -- Estado inicial
+    init(state) := editing;
+    init(isPromptValid) := FALSE;
+    init(isPromptComplete) := TRUE;
+    init(promptRulesSatisfied) := TRUE;
+
+    -- Transición de estados
+    next(state) :=
+        case
+            state = editing & isPromptComplete : validating;
+            state = validating & !isPromptValid : editing;
+            state = validating & isPromptValid : validating;
+            TRUE : state;
+        esac;
+
+    -- Actualización de isPromptValid
+    next(isPromptValid) :=
+        case
+            state = validating : isPromptComplete & promptRulesSatisfied;
+            TRUE : isPromptValid;
+        esac;
